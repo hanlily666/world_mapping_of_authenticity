@@ -2,12 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
-
-interface Location {
-  lat: number
-  lng: number
-  name: string
-}
+import { Location } from '@/types'
 
 interface UploadModalProps {
   isOpen: boolean
