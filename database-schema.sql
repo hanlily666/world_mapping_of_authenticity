@@ -9,6 +9,8 @@ CREATE TABLE submissions (
   longitude DECIMAL(11, 8) NOT NULL,
   location_name TEXT NOT NULL,
   voice_url TEXT,
+  voice_embedding FLOAT8[],  -- Added: Store voice embedding vector for matching
+  voice_language TEXT,        -- Added: Store detected language
   image_url TEXT,
   recipe_text TEXT,
   recipe_audio_url TEXT,
@@ -20,6 +22,7 @@ CREATE TABLE submissions (
 CREATE INDEX idx_submissions_location ON submissions(latitude, longitude);
 CREATE INDEX idx_submissions_created_at ON submissions(created_at);
 CREATE INDEX idx_submissions_location_name ON submissions(location_name);
+CREATE INDEX idx_submissions_voice_language ON submissions(voice_language);  -- Added: Index for language filtering
 
 -- Enable Row Level Security (RLS)
 ALTER TABLE submissions ENABLE ROW LEVEL SECURITY;

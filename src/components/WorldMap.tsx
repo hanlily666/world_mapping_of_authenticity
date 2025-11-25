@@ -81,6 +81,39 @@ export default function WorldMap({ onLocationSelect }: WorldMapProps) {
     []
   )
 
+  // Handle sidebar collapse - resize map to fit new container
+  const handleSidebarCollapseChange = useCallback((collapsed: boolean) => {
+    setIsSidebarCollapsed(collapsed)
+  }, [])
+
+  // Resize map smoothly when sidebar collapses/expands
+  useEffect(() => {
+    if (!map.current) return
+
+    let animationFrameId: number
+    const startTime = Date.now()
+    const duration = 300 // Match the CSS transition duration
+
+    const resizeMap = () => {
+      if (map.current) {
+        map.current.resize()
+      }
+
+      const elapsed = Date.now() - startTime
+      if (elapsed < duration) {
+        animationFrameId = requestAnimationFrame(resizeMap)
+      }
+    }
+
+    resizeMap()
+
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId)
+      }
+    }
+  }, [isSidebarCollapsed])
+
   // Create markers for submissions
   const createMarkers = useCallback(() => {
     if (!map.current) return
@@ -123,6 +156,35 @@ export default function WorldMap({ onLocationSelect }: WorldMapProps) {
 
     const loadSubmissionsOnMapLoad = async () => {
       if (map.current) {
+        // Apply custom colors immediately after load
+        setTimeout(() => {
+          if (map.current) {
+            const layers = map.current.getStyle().layers
+            layers?.forEach((layer: any) => {
+              try {
+                // Set water/ocean to darker yellow
+                if (layer.type === 'background') {
+                  map.current!.setPaintProperty(layer.id, 'background-color', '#C8A860')
+                }
+                if (layer.id.includes('water') || layer.id === 'water') {
+                  if (layer.type === 'fill') {
+                    map.current!.setPaintProperty(layer.id, 'fill-color', '#C8A860')
+                  }
+                }
+                // Set land to lighter yellow
+                if (layer.id.includes('land') || layer.id === 'land') {
+                  if (layer.type === 'background' || layer.type === 'fill') {
+                    const property = layer.type === 'background' ? 'background-color' : 'fill-color'
+                    map.current!.setPaintProperty(layer.id, property, '#F5E6C8')
+                  }
+                }
+              } catch (e) {
+                // Ignore errors for layers that don't support these properties
+              }
+            })
+          }
+        }, 100)
+        
         setupMapStyle(map.current)
         await handleLoadSubmissions()
       }
@@ -173,11 +235,11 @@ export default function WorldMap({ onLocationSelect }: WorldMapProps) {
       <DataPointsSidebar
         submissions={submissions}
         onSubmissionClick={handleSubmissionClick}
-        onCollapseChange={setIsSidebarCollapsed}
+        onCollapseChange={handleSidebarCollapseChange}
       />
 
       {/* Map Container */}
-      <div className="flex-1 relative">
+      <div className="flex-1 relative transition-all duration-300">
         <div ref={mapContainer} className="w-full h-full" />
 
         {/* Header overlay */}

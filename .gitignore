@@ -39,3 +39,20 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Python
+venv/
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.pyc
+
+# Python backend - AI models (too large for git)
+python-backend/venv/
+python-backend/model_cache/
+python-backend/pretrained_models/
+python-backend/.env
