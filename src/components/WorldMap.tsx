@@ -29,6 +29,7 @@ export default function WorldMap({ onLocationSelect }: WorldMapProps) {
   const [lightboxImage, setLightboxImage] = useState<LightboxImage | null>(null)
   const markersRef = useRef<mapboxgl.Marker[]>([])
   const popupsRef = useRef<mapboxgl.Popup[]>([])
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
 
   // Show image lightbox
   const showImageLightbox = useCallback((imageUrl: string, title: string) => {
@@ -58,6 +59,26 @@ export default function WorldMap({ onLocationSelect }: WorldMapProps) {
       navigateToLocation(map.current, submission, submissions, markersRef.current)
     },
     [submissions]
+  )
+
+  // Navigate to a searched place on the map
+  const handlePlaceSelect = useCallback(
+    (lng: number, lat: number, placeName: string) => {
+      if (!map.current) return
+
+      // Close all existing popups
+      popupsRef.current.forEach((popup) => popup.remove())
+      popupsRef.current = []
+
+      // Fly to the selected location
+      map.current.flyTo({
+        center: [lng, lat],
+        zoom: 12,
+        duration: 2000,
+        essential: true
+      })
+    },
+    []
   )
 
   // Create markers for submissions
@@ -152,6 +173,7 @@ export default function WorldMap({ onLocationSelect }: WorldMapProps) {
       <DataPointsSidebar
         submissions={submissions}
         onSubmissionClick={handleSubmissionClick}
+        onCollapseChange={setIsSidebarCollapsed}
       />
 
       {/* Map Container */}
@@ -159,7 +181,10 @@ export default function WorldMap({ onLocationSelect }: WorldMapProps) {
         <div ref={mapContainer} className="w-full h-full" />
 
         {/* Header overlay */}
-        <MapHeader />
+        <MapHeader 
+          isSidebarCollapsed={isSidebarCollapsed} 
+          onPlaceSelect={handlePlaceSelect}
+        />
 
         {/* Upload Modal */}
         {isModalOpen && selectedLocation && (
