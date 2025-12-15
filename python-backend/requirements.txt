@@ -12,6 +12,10 @@ requests==2.32.3  # Required by SpeechBrain
 speechbrain==1.0.0
 torch==2.1.1
 torchaudio==2.1.1
+huggingface_hub==0.23.5  # Compatible with SpeechBrain 1.0.0 (versions <0.24.0)
+
+# Audio processing backend (CRITICAL for torchaudio to work!)
+soundfile==0.12.1  # Provides audio file I/O backend for torchaudio
 
 # Additional utilities
 python-dotenv==1.0.0

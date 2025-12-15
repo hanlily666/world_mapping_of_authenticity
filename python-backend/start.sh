@@ -25,8 +25,8 @@ if [ ! -f ".env" ]; then
 fi
 
 # Start the service
-echo "Starting Flask server on port 5000..."
-echo "📡 Service will be available at http://localhost:5000"
+echo "Starting Flask server on port 5001..."
+echo "📡 Service will be available at http://localhost:5001"
 echo "Press Ctrl+C to stop"
 echo ""
 
